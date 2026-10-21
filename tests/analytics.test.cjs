@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+const A=require('../docs/app.js'),ctx={window:{}};
+vm.runInNewContext(fs.readFileSync(__dirname+'/../docs/data.js','utf8'),ctx);
+const d=ctx.window.FLOWGUARD_DATA;
+const full=A.filter(d,'all',30),last=A.filter(d,'all',1),single=A.filter(d,'S02',1);
+assert.equal(full.length,4302);assert.equal(single.length,24);assert(last.length<=144);
+assert.equal(new Set(last.map(x=>x.time)).size,24);
+assert(single.every(x=>x.site==='S02'));
+const latest=A.latest(last);assert.equal(latest.length,6);
+assert.equal(A.status(latest.find(x=>x.site==='S02')),'Critical');
+assert.equal(A.status(latest.find(x=>x.site==='S05')),'High');
+assert.equal(A.daily(full).length,30);
+assert.equal(A.csv(single).split('\r\n').length,25);
+assert.equal(A.status({level:10,flow:1,energy:1}),'Critical');
+assert.equal(A.status({level:20,flow:10,energy:1}),'Watch');
+assert.equal(A.status({level:30,flow:10,energy:1}),'Normal');
+assert.equal(A.status({level:60,flow:10,energy:8.5}),'Normal');
+console.log('Analytics checks passed: windows, filters, fault detection, aggregation, CSV, threshold boundaries.');
