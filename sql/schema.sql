@@ -1,11 +1,11 @@
-PRAGMA foreign_keys = ON;
+PRAGMA foreign_keys=OFF;
 DROP VIEW IF EXISTS site_daily;
 DROP VIEW IF EXISTS latest_site_status;
+DROP VIEW IF EXISTS latest_storage;
+DROP VIEW IF EXISTS daily_changes;
 DROP TABLE IF EXISTS readings;
+DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS sites;
-CREATE TABLE sites(site_id TEXT PRIMARY KEY, name TEXT NOT NULL, region TEXT NOT NULL, capacity_kl REAL NOT NULL);
-CREATE TABLE readings(
- site_id TEXT REFERENCES sites(site_id), timestamp TEXT NOT NULL,
- level_pct REAL NOT NULL CHECK(level_pct BETWEEN 0 AND 100),
- flow_kl REAL NOT NULL CHECK(flow_kl>=0), energy_kwh REAL NOT NULL CHECK(energy_kwh>=0),
- PRIMARY KEY(site_id,timestamp));
+PRAGMA foreign_keys=ON;
+CREATE TABLE sites(site_id TEXT PRIMARY KEY,name TEXT UNIQUE NOT NULL,kind TEXT NOT NULL CHECK(kind IN ('dam','grid')));
+CREATE TABLE observations(site_id TEXT REFERENCES sites(site_id),date TEXT NOT NULL,storage_pct REAL NOT NULL CHECK(storage_pct>=0),volume_ml REAL NOT NULL CHECK(volume_ml>=0),PRIMARY KEY(site_id,date));
