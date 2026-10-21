@@ -2,7 +2,7 @@ const Analytics={
  filter(data,site,days){const end=Date.parse(data.meta.end);return data.records.filter(r=>(site==='all'||r.site===site)&&Date.parse(r.date)>end-days*86400000)},
  latest(rows){const m=new Map();for(const r of rows)if(!m.has(r.site)||m.get(r.site).date<r.date)m.set(r.site,r);return [...m.values()]},
  changes(rows){const groups=new Map(),out=[];for(const r of rows){if(!groups.has(r.site))groups.set(r.site,[]);groups.get(r.site).push(r)}for(const group of groups.values()){group.sort((a,b)=>a.date.localeCompare(b.date));for(let i=1;i<group.length;i++){const a=group[i-1],b=group[i];if(Date.parse(b.date)-Date.parse(a.date)===86400000)out.push({...b,prior:a.date,priorPct:a.pct,priorMl:a.ml,delta:b.pct-a.pct,volumeDelta:b.ml-a.ml})}}return out},
- largest(rows){const m=new Map();for(const r of this.changes(rows))if(!m.has(r.site)||Math.abs(r.delta)>Math.abs(m.get(r.site).delta))m.set(r.site,r);return [...m.values()].sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta))},
+ largest(rows){const m=new Map();for(const r of this.changes(rows))if(!m.has(r.site)||Math.abs(r.delta)>Math.abs(m.get(r.site).delta)+1e-9)m.set(r.site,r);return [...m.values()].sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta))},
  csv(rows,names){return 'storage,date,storage_percent,stored_volume_ML\r\n'+rows.map(r=>['"'+names[r.site].replaceAll('"','""')+'"',r.date,r.pct,r.ml].join(',')).join('\r\n')}
 };
 if(typeof module!=='undefined')module.exports=Analytics;

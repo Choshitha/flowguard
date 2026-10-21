@@ -9,3 +9,5 @@ const sample=[{site:'x',date:'2026-01-01',pct:50,ml:10},{site:'x',date:'2026-01-
 assert.equal(A.largest(sample)[0].date,'2026-01-02');assert.equal(A.largest(sample)[0].delta,-2);assert.equal(A.changes(sample)[0].volumeDelta,-2);
 assert.equal(A.csv(short,Object.fromEntries(d.sites.map(s=>[s.id,s.name]))).split('\r\n').length,31);
 console.log('Real-data analytics checks passed: dates, measurements, filter bounds, missing-day handling, tie-breaking and CSV.');
+
+assert.equal(A.largest([{site:'x',date:'2026-01-01',pct:.3,ml:3},{site:'x',date:'2026-01-02',pct:.2,ml:2},{site:'x',date:'2026-01-03',pct:.1,ml:1}])[0].date,'2026-01-02');
