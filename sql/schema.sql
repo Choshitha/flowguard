@@ -9,3 +9,15 @@ DROP TABLE IF EXISTS sites;
 PRAGMA foreign_keys=ON;
 CREATE TABLE sites(site_id TEXT PRIMARY KEY,name TEXT UNIQUE NOT NULL,kind TEXT NOT NULL CHECK(kind IN ('dam','grid')));
 CREATE TABLE observations(site_id TEXT REFERENCES sites(site_id),date TEXT NOT NULL,storage_pct REAL NOT NULL CHECK(storage_pct>=0),volume_ml REAL NOT NULL CHECK(volume_ml>=0),PRIMARY KEY(site_id,date));
+-- Drop dependent analytical views before rebuilding their definitions.
+DROP VIEW IF EXISTS window_summary;
+DROP VIEW IF EXISTS window_changes;
+DROP VIEW IF EXISTS analysis_observations;
+DROP VIEW IF EXISTS rolling_storage;
+DROP VIEW IF EXISTS monthly_storage;
+DROP VIEW IF EXISTS drawdown_path;
+DROP VIEW IF EXISTS maximum_drawdown;
+DROP VIEW IF EXISTS decline_runs;
+DROP VIEW IF EXISTS decline_groups;
+DROP VIEW IF EXISTS paired_changes;
+DROP VIEW IF EXISTS change_correlations;

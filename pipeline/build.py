@@ -39,6 +39,20 @@ def build(path,retrieved="2026-10-21"):
     db.executemany('INSERT INTO observations VALUES (?,?,?,?)',[(ids[n],d,p,m) for n,d,p,m in rows]);db.executescript((ROOT/'sql/analytics.sql').read_text());db.commit();db.execute('VACUUM')
     start=min(r[1] for r in rows);end=max(r[1] for r in rows);days=(datetime.fromisoformat(end)-datetime.fromisoformat(start)).days+1
     data={'meta':{'source':'Seqwater historical CSV export','url':SOURCE,'start':start,'end':end,'retrieved':retrieved,'timezone':'Australia/Brisbane','frequency':'Last observation per calendar day','raw':raw,'accepted':len(rows),'invalid':len(rejected),'duplicates':duplicates,'expected':days*len(sites),'missing':days*len(sites)-len(rows),'archive_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'members':sources},'sites':sites,'records':[{'site':ids[n],'date':d,'pct':p,'ml':m} for n,d,p,m in rows]}
+    # Export query results: the research panels display actual SQLite outputs.
+    db.row_factory=sqlite3.Row
+    analysis={}
+    for key,view in [('summary','window_summary'),('monthly','monthly_storage'),('drawdown','maximum_drawdown'),('runs','decline_runs'),('correlations','change_correlations')]:
+        analysis[key]=[dict(r) for r in db.execute('SELECT * FROM '+view)]
+    for pair in analysis['correlations']:
+        denominator=pair['denominator_squared']
+        pair['pearson_r']=max(-1.,min(1.,pair['numerator']/math.sqrt(denominator))) if denominator>0 and pair['n']>=3 else None
+    data['analysis']=analysis
+    rolling={(r['site_id'],r['date']):dict(r) for r in db.execute('SELECT * FROM rolling_storage')}
+    for record in data['records']:
+        stats=rolling[(record['site'],record['date'])]
+        record.update({k:stats[k] for k in ['mean_7d','count_7d','mean_30d','count_30d']})
+    data['queries']=[{'id':r['name'],'sql':r['sql']} for r in db.execute("SELECT name,sql FROM sqlite_master WHERE type='view' ORDER BY name")]
     (ROOT/'docs/data.js').write_text('window.FLOWGUARD_DATA='+json.dumps(data,separators=(',',':'))+';\n')
     (ROOT/'pipeline/rejections.json').write_text(json.dumps(rejected,indent=2))
     db.close();print(json.dumps({k:v for k,v in data['meta'].items() if k!='members'},indent=2))

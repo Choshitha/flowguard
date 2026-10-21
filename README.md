@@ -14,6 +14,19 @@ Source: https://www.seqwater.com.au/historic-dam-levels
 
 The publisher describes these as automated, unverified daily observations. Each record is the last observation on its calendar day and may omit intraday peaks. The download includes dates, not precise observation times. This is a historical snapshot, not a live feed.
 
+## Analytical review / version 3
+
+The research workspace displays query results produced in SQLite, rather than presenting example SQL alongside unrelated charts. Research panels follow the selected 30-day, 90-day or full-year window. The overview defaults to the full observed year.
+
+- Calendar rolling means (7/30 days), with accepted-observation counts and explicit axis controls.
+- Ranked endpoints and monthly aggregates with incomplete months flagged.
+- Ordered peak-to-trough maximum drawdown using cumulative maxima, ranking and a correlated peak-date lookup.
+- Gaps-and-islands analysis of consecutive strictly declining calendar days.
+- Same-date self-joins for cross-dam daily-change Pearson correlation. SQL computes sufficient statistics; Python normalises them and guards zero variance. The overlapping grid is excluded.
+- A query notebook showing the executed SQL view definitions, dependent views and materialised result previews. It is not an arbitrary browser SQL executor.
+
+The source page retains the publisher’s automated/unverified caveat and the snapshot date. The main interface uses a concise provenance strip. No change implies publisher verification, live data, causal inference or recurring seasonal behaviour.
+
 ## Working features
 
 - Regional and individual dam views with 30-day, 90-day and full-year filters.
@@ -61,7 +74,7 @@ This workflow deliberately imports official user-downloadable exports. It does n
 ## SQL worth practising
 
 - `sql/schema.sql`: relational keys, foreign keys, value constraints and separate `dam`/`grid` series types.
-- `sql/analytics.sql`: `LAG` for consecutive-day changes, `ROW_NUMBER` for latest observations, date differences and safe missing-day handling.
+- `sql/analytics.sql`: CTEs, conditional aggregation, `LAG`, ranked endpoints, calendar `RANGE` frames, running maxima, correlated subqueries, gaps-and-islands grouping and matched-date self-joins.
 - `pipeline/flowguard.sqlite`: generated local database with actual accepted observations.
 
 The browser uses the exported accepted rows and calculates filtered metrics in JavaScript. Python tests compare SQLite values exactly against the original CSV; Node checks verify browser calculations.
@@ -85,3 +98,9 @@ Source data: **Seqwater**, downloaded using its historical CSV export. Publisher
 ## Relationship to version 1
 
 Version 1 was a fictional water/energy demonstration. Version 2 replaces those readings and seeded faults with real published storage data and descriptive analysis. Git history preserves the original implementation. The current site contains no simulated telemetry.
+
+## Findings from the full observed year
+
+The official regional grid moved from 80.7% to 79.3% (−1.4 percentage points). Its maximum ordered drawdown was 6.7 pp, from an observed peak on 19 March 2026 to a subsequent trough on 18 October 2026. March 2026 had the largest complete-month first-to-last rise (+7.8 pp). Among the six selected dams, Little Nerang had the largest maximum drawdown (26.2 pp). These are descriptive findings within this dataset and time window, not risk ratings or causal diagnoses.
+
+One annual cycle does not establish seasonality. Correlations are exploratory, depend on matched observations and have not been adjusted for multiple comparisons; they are not forecasts. Day-to-day changes use rounded publisher percentages and may be quantised. Monthly first-to-last changes omit transitions between months and should not be summed into annual change. The earliest longest decline run wins ties; maximum drawdown uses the earliest trough among equal drawdowns and the most recent equal preceding peak. Rolling means include available history before the selected analysis window and expose their observation counts.
