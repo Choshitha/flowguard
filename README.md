@@ -93,7 +93,7 @@ The browser uses the exported accepted rows and calculates filtered metrics in J
 | Stored volume | Published ML for that same latest observation |
 | Change over window | Last observed percentage minus first observed percentage, in percentage points |
 | Largest daily movement | Largest absolute change between consecutive dates in selected window; earliest pair wins ties |
-| Coverage | Accepted unique series-days ÷ dates × imported series |
+| Coverage | Accepted unique series-days ÷ (calendar dates × imported series) |
 
 A stored-volume change is not demand or pumped volume. An observed change does not identify a leak, flood event, equipment fault or cybersecurity incident. Capacity changes and reduced operating levels affect interpretation. Follow the publisher's notes for North Pine, Somerset and Wivenhoe. No safety or drought classification is inferred from a percentage alone.
 
