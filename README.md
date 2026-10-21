@@ -1,20 +1,26 @@
-# FlowGuard — SEQ Water Intelligence
+# South East Queensland Water Storage Analytics
 
-**An independent real-data portfolio project by Choshitha Anisetti.**
+**FlowGuard — regional storage trends, drawdown analysis and comparative dam performance.**
 
 [Open the dashboard](https://choshitha.github.io/flowguard/#overview)
 
 Published dam observations → Python validation → SQLite analytics → interactive GitHub Pages dashboard.
 
-## Data in this version
+## Original source data
 
 Official Seqwater historical CSV export downloaded on **21 October 2026**, covering **21 October 2025–21 October 2026** inclusive. Six individual dams (Baroon Pocket, Hinze, Little Nerang, North Pine, Somerset and Wivenhoe) plus the official SEQ Water Grid regional aggregate. The archive contains **2,561 actual observations** from 2,562 expected series-day slots; one regional grid day is missing. No observations are simulated, imputed or interpolated.
 
-Source: https://www.seqwater.com.au/historic-dam-levels
+Publisher: **Seqwater**
+
+Publisher page: https://www.seqwater.com.au/historic-dam-levels
+
+[Download the original publisher export](https://choshitha.github.io/flowguard/source/seqwater-historical-storage.zip)
+
+The downloadable ZIP is byte-for-byte identical to `pipeline/raw/seqwater-history.zip`. Original CSV field names are `Name`, `Date`, `Last Observation (%)`, and `Last Observation (ML)`. Displayed summaries are derived separately and do not replace the original files.
 
 The publisher describes these as automated, unverified daily observations. Each record is the last observation on its calendar day and may omit intraday peaks. The download includes dates, not precise observation times. This is a historical snapshot, not a live feed.
 
-## Analytical review / version 3
+## Analytical methods
 
 The research workspace displays query results produced in SQLite, rather than presenting example SQL alongside unrelated charts. Research panels follow the selected 30-day, 90-day or full-year window. The overview defaults to the full observed year.
 
@@ -71,7 +77,7 @@ The importer reads the retained original ZIP, validates known series, dates and 
 
 This workflow deliberately imports official user-downloadable exports. It does not rely on scraping, undocumented endpoints, or claim an automatic refresh. Some publisher pages restrict programmatic downloads.
 
-## SQL worth practising
+## SQL definitions
 
 - `sql/schema.sql`: relational keys, foreign keys, value constraints and separate `dam`/`grid` series types.
 - `sql/analytics.sql`: CTEs, conditional aggregation, `LAG`, ranked endpoints, calendar `RANGE` frames, running maxima, correlated subqueries, gaps-and-islands grouping and matched-date self-joins.
@@ -93,11 +99,7 @@ A stored-volume change is not demand or pumped volume. An observed change does n
 
 ## Source rights and attribution
 
-Source data: **Seqwater**, downloaded using its historical CSV export. Publisher rights are retained; this project does not apply a new licence to source data or claim that an open-data licence was verified. The retained archive and member checksums document provenance. Source caveats and attribution appear in the dashboard. This is an independent educational analysis, not a Seqwater product or endorsement. No source logos, photos or capstone/employer documents are included.
-
-## Relationship to version 1
-
-Version 1 was a fictional water/energy demonstration. Version 2 replaces those readings and seeded faults with real published storage data and descriptive analysis. Git history preserves the original implementation. The current site contains no simulated telemetry.
+Source data: **Seqwater**, downloaded using its historical CSV export. Publisher rights are retained; this dashboard does not apply a new licence to source data or claim that an open-data licence was verified. The retained archive and member checksums document provenance. Source caveats and attribution appear in the dashboard. FlowGuard is a separate analytical presentation and is not a Seqwater product or endorsement.
 
 ## Findings from the full observed year
 
